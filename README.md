@@ -1,18 +1,18 @@
-# NAME
+## NAME
 
 check\_tc4400
 
-# VERSION
+## VERSION
 
 0.1
 
-# SYNOPSIS
+## SYNOPSIS
 
 ```
 check_tc4400 -H HOST -u USER -p PASS
 ```
 
-# OPTIONS
+## OPTIONS
 
 - **H** _HOSTNAME_
 
@@ -26,7 +26,7 @@ check_tc4400 -H HOST -u USER -p PASS
 
     Password to authenticate with to the modem's webinterface.
 
-# DESCRIPTION
+## DESCRIPTION
 
 This script connects to the TC4400 webinterface and parses the connection status page.
 
@@ -44,13 +44,17 @@ It warns or returns a critical state if:
 * upstream channel transmission level is below 32dBmV/34dBmV or above 54.1dBmV/56.1dBmV
 ```
 
-# DEPENDENCIES
+## DEPENDENCIES
 
 - `LWP::UserAgent`
 - `HTML::TableExtract`
 - `Pod::Usage`
 - `Getopt::Long`
 
-# AUTHOR
+## AUTHOR
 
 Philippe Kueck &lt;projects at unixadm dot org>
+
+## EXAMPLE
+
+![screenshot](https://raw.githubusercontent.com/philfry/check_tc4400/master/modemdata.png)
