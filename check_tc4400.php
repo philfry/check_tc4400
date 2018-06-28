@@ -67,9 +67,9 @@ foreach (array(
     $opt[$i] = " -E -b 1000 --title \"Downstream $title codewords\" ";
     $def[$i] = "";
     for ($c = 1; $c <= 31; $c++) {
-    	$v = sprintf("dn%02d_%s", $c, $id);
-    	$def[$i] .= rrd::def($v, $RRDFILE[$myds[$v]], $DS[$myds[$v]], "AVERAGE");
-    	$def[$i] .= rrd::line1($v, rrd::color($c), rrd::cut("channel $c", 24));
-    	$def[$i] .= rrd::gprint($v, array("LAST", "AVERAGE", "MAX"), "%7.0lf");
+        $v = sprintf("dn%02d_%s", $c, $id);
+        $def[$i] .= rrd::def($v, $RRDFILE[$myds[$v]], $DS[$myds[$v]], "AVERAGE");
+        $def[$i] .= rrd::area($v, rrd::color($c), rrd::cut("channel $c", 24), "STACK");
+        $def[$i] .= rrd::gprint($v, array("LAST", "AVERAGE", "MAX"), "%7.0lf");
     }
 }
