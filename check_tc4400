@@ -99,6 +99,11 @@ foreach my $r ($ts->rows) {
         push @$statusline, sprintf "dch%02d is %s", $r->[0], $r->[2];
         next
     }
+    if ($r->[4] ne "Bonded") {
+        $retval = 1 if $retval < 1;
+        my ($frq) = $r->[5] =~ /^(\d+)/; $frq ||= 0;
+        push @$statusline, sprintf "dch%02d@%.1fMHz is %s", $r->[0], $frq/10**6, $r->[4]
+    }
     $perfdata->{'dn'}->{$r->[0]} = {
         'snr' => ($r->[7] =~ /([\d.]+) dB/)[0],
         'rlvl' => ($r->[8] =~ /([\d.]+) dBmV/)[0],
@@ -135,6 +140,11 @@ foreach my $r ($ts->rows) {
         push @$statusline, sprintf "uch%02d is %s", $r->[0], $r->[2];
         next
     }
+    if ($r->[4] ne "Bonded") {
+        $retval = 1 if $retval < 1;
+        my ($frq) = $r->[5] =~ /^(\d+)/; $frq ||= 0;
+        push @$statusline, sprintf "uch%02d@%.1fMHz is %s", $r->[0], $frq/10**6, $r->[4]
+    }
     $perfdata->{'up'}->{$r->[0]} = {
         'tlvl' => ($r->[7] =~ /([\d.]+) dBmV/)[0]
     };
@@ -170,7 +180,7 @@ check_tc4400
 
 =head1 VERSION
 
-0.1
+0.2
 
 =head1 SYNOPSIS
 
