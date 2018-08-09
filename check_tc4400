@@ -28,9 +28,11 @@ GetOptions(
     'H=s' => \$config->{'host'},
     'u=s' => \$config->{'user'},
     'p=s' => \$config->{'pass'},
+    'r=s' => \$config->{'file'},
     'h|help' => sub {pod2usage({'-exitval' => 3, '-verbose' => 2})}
 ) or pod2usage({'-exitval' => 3, '-verbose' => 0});
-pod2usage({'-exitval' => 3, '-verbose' => 0}) unless $config->{'host'};
+pod2usage({'-exitval' => 3, '-verbose' => 0})
+    unless $config->{'host'} || $config->{'file'};
 
 my ($statusline, $perfdata, $retval) = ([], undef, 0);
 
@@ -57,24 +59,28 @@ sub check_upstream_signal_level {
     0
 }
 
-my $ua = new LWP::UserAgent;
-$ua->agent("nagios/check_tc4400");
-$ua->credentials(
-    $config->{'host'}.":80", "Broadband Router",
-    $config->{'user'}, $config->{'pass'}
-);
-
-local $SIG{ALRM} = sub {nagexit 3, "timeout"};
-alarm 60;
-
-my $resp = $ua->get(
-    sprintf "http://%s/cmconnectionstatus.html", $config->{'host'}
-);
-
-nagexit 3, $resp->status_line unless $resp->is_success;
-
 my $table = new HTML::TableExtract;
-$table->parse($resp->decoded_content);
+if ($config->{'host'}) {
+    my $ua = new LWP::UserAgent;
+    $ua->agent("nagios/check_tc4400");
+    $ua->credentials(
+        $config->{'host'}.":80", "Broadband Router",
+        $config->{'user'}, $config->{'pass'}
+    );
+
+    local $SIG{ALRM} = sub {nagexit 3, "timeout"};
+    alarm 60;
+
+    my $resp = $ua->get(
+        sprintf "http://%s/cmconnectionstatus.html", $config->{'host'}
+    );
+
+    nagexit 3, $resp->status_line unless $resp->is_success;
+
+    $table->parse($resp->decoded_content)
+} elsif ($config->{'file'}) {
+    $table->parse_file($config->{'file'})
+}
 
 # startup procedure
 my $ts = $table->table(0,0);
@@ -180,7 +186,7 @@ check_tc4400
 
 =head1 VERSION
 
-0.2
+0.3
 
 =head1 SYNOPSIS
 
@@ -201,6 +207,10 @@ Username to authenticate with to the modem's webinterface.
 =item B<p> I<password>
 
 Password to authenticate with to the modem's webinterface.
+
+=item B<r> I<filename>
+
+Read data from file (usually for debugging purposes).
 
 =back
 
