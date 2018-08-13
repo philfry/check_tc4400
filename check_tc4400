@@ -36,26 +36,42 @@ pod2usage({'-exitval' => 3, '-verbose' => 0})
 
 my ($statusline, $perfdata, $retval) = ([], undef, 0);
 
-sub check_downstream_snr {
-    if ($_[1] eq "QAM256") {
-        return 2 if $_[0] <= 30;
-        return 1 if $_[0] <= 32
-    } elsif ($_[1] eq "QAM64") {
-        return 2 if $_[0] <= 24;
-        return 1 if $_[0] <= 26
+my $limits = {
+    'snr' => {
+        'qam4096' => [42, 44],
+        'qam2048' => [39, 41],
+        'qam1024' => [36, 38],
+        'qam256'  => [30, 32],
+        'qam64'   => [24, 26]
+    },
+    'rlvl' => {
+        'qam4096' => [ -2,   0, 24.1, 26.1],
+        'qam2048' => [ -4,  -2, 22.1, 24.1],
+        'qam1024' => [ -6,  -4, 20.1, 22.1],
+        'qam256'  => [ -8,  -6, 18.1, 20.1],
+        'qam64'   => [-14, -12, 12.1, 14.1]
+    },
+    'tlvl' => {
+        'atdma'   => [ 38, 40, 48.1, 50.1], # docsis 3.0
+        'ofdm'    => [ 35, 37, 51.1, 53.1]  # docsis 3.1
     }
+};
+
+sub check_downstream_snr {
+    return 2 if $_[0] <= $limits->{'snr'}->{$_[2]||'qam1024'}->[0];
+    return 1 if $_[0] <= $limits->{'snr'}->{$_[2]||'qam1024'}->[1];
     0
 }
 
 sub check_downstream_signal_level {
-    return 2 if ($_[0] <= -8 || $_[0] >= 20.1);
-    return 1 if ($_[0] <= -6 || $_[0] >= 18.1);
+    return 2 if $_[0] <= $limits->{'rlvl'}->{$_[2]||'qam1024'}->[0];
+    return 1 if $_[0] <= $limits->{'rlvl'}->{$_[2]||'qam1024'}->[1];
     0
 }
 
 sub check_upstream_signal_level {
-    return 2 if ($_[0] <= 32 || $_[0] >= 54.1);
-    return 1 if ($_[0] <= 34 || $_[0] >= 56.1);
+    return 2 if $_[0] <= $limits->{'tlvl'}->{$_[2]}->[0];
+    return 1 if $_[0] <= $limits->{'tlvl'}->{$_[2]}->[1];
     0
 }
 
@@ -118,7 +134,7 @@ foreach my $r ($ts->rows) {
         'cwfail' => $r->[12]
     };
     my $_retval = check_downstream_snr(
-        $perfdata->{'dn'}->{$r->[0]}->{'snr'}, $r->[9]
+        $perfdata->{'dn'}->{$r->[0]}->{'snr'}, lc $r->[3], lc $r->[9]
     );
     if ($_retval > 0) {
         $retval = $_retval if $retval < $_retval;
@@ -127,7 +143,7 @@ foreach my $r ($ts->rows) {
                 $perfdata->{'dn'}->{$r->[0]}->{'snr'};
     }
     $_retval = check_downstream_signal_level(
-        $perfdata->{'dn'}->{$r->[0]}->{'rlvl'}
+        $perfdata->{'dn'}->{$r->[0]}->{'rlvl'}, lc $r->[3], lc $r->[9]
     );
     if ($_retval > 0) {
         $retval = $_retval if $retval < $_retval;
@@ -155,7 +171,7 @@ foreach my $r ($ts->rows) {
         'tlvl' => ($r->[7] =~ /([\d.]+) dBmV/)[0]
     };
     my $_retval = check_upstream_signal_level(
-        $perfdata->{'up'}->{$r->[0]}->{'tlvl'}
+        $perfdata->{'up'}->{$r->[0]}->{'tlvl'}, lc $r->[3], lc $r->[8]
     );
     if ($_retval > 0) {
         $retval = $_retval if $retval < $_retval;
@@ -186,7 +202,7 @@ check_tc4400
 
 =head1 VERSION
 
-0.3
+0.4
 
 =head1 SYNOPSIS
 
@@ -225,10 +241,11 @@ It warns or returns a critical state if:
  * Configuration File is not "OK"
  * Security is not "Enabled"
  * downstream channel is not "Locked"
- * downstream channel signal/noise ratio is below 32dB/30dB (QAM256)
- * downstream channel signal/noise ratio is below 24dB/26dB (QAM64)
- * downstream channel receive level is below -8dBmV/-6dBmV or above 18.1dBmV/20.1dBmV
- * upstream channel transmission level is below 32dBmV/34dBmV or above 54.1dBmV/56.1dBmV
+ * downstream channel signal/noise ratio is below a predefined value
+ * downstream channel transmission level is odd
+ * upstream channel transmission level is odd
+
+see L<20180617_Pegelwerte.pdf> for thresholds.
 
 =head1 DEPENDENCIES
 
