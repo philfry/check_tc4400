@@ -1,16 +1,16 @@
 ## NAME
 
+```
 check\_tc4400
+```
 
 ## VERSION
 
-0.4
+0.5
 
 ## SYNOPSIS
 
-```
-check_tc4400 -H HOST -u USER -p PASS
-```
+    check_tc4400 <OPTIONS>
 
 ## OPTIONS
 
@@ -30,20 +30,27 @@ check_tc4400 -H HOST -u USER -p PASS
 
     Read data from file (usually for debugging purposes).
 
+- **i** _{docsis30|docsis31}_
+
+    Do not check thresholds for _{docsis30|docsis31}_. Collect perfdata though.
+    Useful when your line performance is really bad but your modem works
+    nonetheless, or you're connected both with docsis 3.0 and 3.1 but the modem
+    only uses either of them.
+
 ## DESCRIPTION
 
 This script connects to the TC4400 webinterface and parses the connection status page.
 
 It warns or returns a critical state if:
 
-   - Connectivity State is not "OK"
-   - Boot State is not "OK"
-   - Configuration File is not "OK"
-   - Security is not "Enabled"
-   - downstream channel is not "Locked"
-   - downstream channel signal/noise ratio is below a predefined value
-   - downstream channel transmission level is odd
-   - upstream channel transmission level is odd
+    - Connectivity State is not "OK"
+    - Boot State is not "OK"
+    - Configuration File is not "OK"
+    - Security is not "Enabled"
+    - downstream channel is not "Locked"
+    - downstream channel signal/noise ratio is below a predefined value
+    - downstream channel transmission level is odd
+    - upstream channel transmission level is odd
 
 see [20180617\_Pegelwerte.pdf](https://raw.githubusercontent.com/philfry/check_tc4400/master/20180617_Pegelwerte.pdf) for thresholds.
 

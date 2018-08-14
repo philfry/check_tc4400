@@ -29,10 +29,12 @@ GetOptions(
     'u=s' => \$config->{'user'},
     'p=s' => \$config->{'pass'},
     'r=s' => \$config->{'file'},
+    'i=s' => \$config->{'ignore'},
     'h|help' => sub {pod2usage({'-exitval' => 3, '-verbose' => 2})}
 ) or pod2usage({'-exitval' => 3, '-verbose' => 0});
 pod2usage({'-exitval' => 3, '-verbose' => 0})
-    unless $config->{'host'} || $config->{'file'};
+    unless ($config->{'host'} || $config->{'file'}) &&
+    ($config->{'ignore'}||"") =~ /^(?:docsis3[01])?$/;
 
 my ($statusline, $perfdata, $retval) = ([], undef, 0);
 
@@ -133,6 +135,8 @@ foreach my $r ($ts->rows) {
         'cwcorr' => $r->[11],
         'cwfail' => $r->[12]
     };
+    next if (($config->{'ignore'}||"") eq "docsis30" && $r->[3] =~ /^SC-QAM/);
+    next if (($config->{'ignore'}||"") eq "docsis31" && $r->[3] =~ /^OFDM/);
     my $_retval = check_downstream_snr(
         $perfdata->{'dn'}->{$r->[0]}->{'snr'}, lc $r->[3], lc $r->[9]
     );
@@ -202,11 +206,11 @@ check_tc4400
 
 =head1 VERSION
 
-0.4
+0.5
 
 =head1 SYNOPSIS
 
- check_tc4400 -H HOST -u USER -p PASS
+ check_tc4400 <OPTIONS>
 
 =head1 OPTIONS
 
@@ -227,6 +231,13 @@ Password to authenticate with to the modem's webinterface.
 =item B<r> I<filename>
 
 Read data from file (usually for debugging purposes).
+
+=item B<i> I<{docsis30|docsis31}>
+
+Do not check thresholds for I<{docsis30|docsis31}>. Collect perfdata though.
+Useful when your line performance is really bad but your modem works
+nonetheless, or you're connected both with docsis 3.0 and 3.1 but the modem
+only uses either of them.
 
 =back
 
