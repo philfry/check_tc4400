@@ -4,10 +4,6 @@
 check\_tc4400
 ```
 
-## VERSION
-
-0.5
-
 ## SYNOPSIS
 
     check_tc4400 <OPTIONS>
