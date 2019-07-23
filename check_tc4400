@@ -38,6 +38,8 @@ pod2usage({'-exitval' => 3, '-verbose' => 0})
 
 my ($statusline, $perfdata, $retval) = ([], undef, 0);
 
+my @ofdm_prf = ('qam256', 'qam1024', 'qam2048', 'qam4096');
+
 my $limits = {
     'snr' => {
         'qam4096' => [42, 44],
@@ -60,14 +62,16 @@ my $limits = {
 };
 
 sub check_downstream_snr {
-    return 2 if $_[0] <= $limits->{'snr'}->{$_[2]||'qam1024'}->[0];
-    return 1 if $_[0] <= $limits->{'snr'}->{$_[2]||'qam1024'}->[1];
+    my $qam = ($_[2] =~ /^qam/)?$_[2]:$ofdm_prf[~~(sort split(/, */,$_[2]))[-1]];
+    return 2 if $_[0] <= $limits->{'snr'}->{$qam}->[0];
+    return 1 if $_[0] <= $limits->{'snr'}->{$qam}->[1];
     0
 }
 
 sub check_downstream_signal_level {
-    return 2 if $_[0] <= $limits->{'rlvl'}->{$_[2]||'qam1024'}->[0];
-    return 1 if $_[0] <= $limits->{'rlvl'}->{$_[2]||'qam1024'}->[1];
+    my $qam = ($_[2] =~ /^qam/)?$_[2]:$ofdm_prf[~~(sort split(/, */,$_[2]))[-1]];
+    return 2 if $_[0] <= $limits->{'rlvl'}->{$qam}->[0];
+    return 1 if $_[0] <= $limits->{'rlvl'}->{$qam}->[1];
     0
 }
 
@@ -206,7 +210,7 @@ check_tc4400
 
 =head1 VERSION
 
-0.5
+0.6
 
 =head1 SYNOPSIS
 
