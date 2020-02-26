@@ -1,7 +1,7 @@
 ## NAME
 
 ```
-check\_tc4400
+check_tc4400
 ```
 
 ## SYNOPSIS
@@ -10,23 +10,23 @@ check\_tc4400
 
 ## OPTIONS
 
-- **H** _HOSTNAME_
+- **H**,**hostname** _HOSTNAME_
 
     Hostname or ip address of your tc4400 modem.
 
-- **u** _username_
+- **u**,**username** _username_
 
     Username to authenticate with to the modem's webinterface.
 
-- **p** _password_
+- **p**,**password** _password_
 
     Password to authenticate with to the modem's webinterface.
 
-- **r** _filename_
+- **r**,**read** _filename_
 
     Read data from file (usually for debugging purposes).
 
-- **i** _{docsis30|docsis31}_
+- **i**,**ignore** _{docsis30|docsis31}_
 
     Do not check thresholds for _{docsis30|docsis31}_. Collect perfdata though.
     Useful when your line performance is really bad but your modem works
@@ -49,13 +49,6 @@ It warns or returns a critical state if:
     - upstream channel transmission level is odd
 
 see [20180617\_Pegelwerte.pdf](https://raw.githubusercontent.com/philfry/check_tc4400/master/20180617_Pegelwerte.pdf) for thresholds.
-
-## DEPENDENCIES
-
-- `LWP::UserAgent`
-- `HTML::TableExtract`
-- `Pod::Usage`
-- `Getopt::Long`
 
 ## AUTHOR
 
