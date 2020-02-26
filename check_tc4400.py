@@ -4,7 +4,6 @@
 # check_tc4400 - checks tc4400 modem status
 # author, (c): Philippe Kueck <projects at unixadm dot org>
 
-
 from optparse import OptionParser, OptionGroup
 
 import base64
@@ -12,7 +11,33 @@ import urllib.request
 import lxml.html
 import re
 
-import thresholds
+class thresholds:
+    # snr limits [warn, crit]
+    _snr = {
+        'qam4096': [44, 42],
+        'qam2048': [41, 39],
+        'qam1024': [38, 36],
+        'qam256':  [32, 30],
+        'qam64':   [26, 24]
+    }
+
+    # receive level ranges
+    # [min crit, min warn, max warn, max crit]
+    _rlvl = {
+        'qam4096': [ -2,   0, 24.1, 26.1],
+        'qam2048': [ -4,  -2, 22.1, 24.1],
+        'qam1024': [ -6,  -4, 20.1, 22.1],
+        'qam256':  [ -8,  -6, 18.1, 20.1],
+        'qam64':   [-14, -12, 12.1, 14.1]
+    }
+
+    # transmission level ranges
+    # min crit, min warn, max warn, max crit
+    _tlvl = {
+        'atdma': [ 38, 40, 48.1, 50.1], # docsis 3.0
+        'ofdm':  [ 35, 37, 51.1, 53.1]  # docsis 3.1
+    }
+
 ofdm_profiles = ['qam256', 'qam1024', 'qam2048', 'qam4096']
 
 def nagexit(exitc, statusline, perfdata = []):
@@ -67,10 +92,10 @@ def main():
                     bytes("%s:%s" % (options.user, options.password), 'ascii')
                 )
                 req.add_header("Authorization", "Basic %s" % auth.decode('utf-8'))
-    
+
             with urllib.request.urlopen(req, None, 60) as fh:
                 data = fh.read()
-    
+
         except urllib.error.URLError as e:
             nagexit(3, ["Connecting to webinterface failed with '{}'".format(e.reason)])
 
@@ -84,7 +109,7 @@ def main():
     tables = doc.xpath('//table')
     if len(tables) == 0:
         nagexit(3, ["Unable to parse connectionstatus page"])
-    
+
     floaty = re.compile(r'^\d+(\.\d+)?')
 
     perfdata = []
@@ -186,11 +211,11 @@ def main():
 
     nagexit(rc, statusline, perfdata)
 
-    
+
 
 if __name__ == "__main__":
     desc = "%prog checks your tc4400's status and performance data."
-    parser = OptionParser(description=desc,version="%prog version 0.7")
+    parser = OptionParser(description=desc,version="%prog version 0.8")
     gen_opts = OptionGroup(parser, "Generic options")
     thres_opts = OptionGroup(parser, "Threshold options")
     parser.add_option_group(gen_opts)
