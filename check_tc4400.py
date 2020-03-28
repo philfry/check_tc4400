@@ -34,8 +34,8 @@ class thresholds:
     # transmission level ranges
     # min crit, min warn, max warn, max crit
     _tlvl = {
-        'atdma': [ 38, 40, 48.1, 50.1], # docsis 3.0
-        'ofdm':  [ 35, 37, 51.1, 53.1]  # docsis 3.1
+        'atdma': [ 35, 37, 51.1, 53.1], # docsis 3.0
+        'ofdm':  [ 38, 40, 48.1, 50.1]  # docsis 3.1
     }
 
 ofdm_profiles = ['qam256', 'qam1024', 'qam2048', 'qam4096']
