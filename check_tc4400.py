@@ -135,10 +135,13 @@ def main():
     # downstream channel status
     downstream_chan_data = parse_table(tables[1])
     for ds in downstream_chan_data:
-        rlvl = float(re.search(floaty, ds["Receive Level"]).group(0))
+        # output changed somewhen between SR70.12.33 and SR70.12.42
+        try: rlvl = float(re.search(floaty, ds["Receive Level"]).group(0))
+        except KeyError: rlvl = float(re.search(floaty, ds["Received Level"]).group(0))
         snr = float(re.search(floaty, ds["SNR/MER Threshold Value"]).group(0))
         frq = float(re.search(floaty, ds["Center Frequency"]).group(0))/10**6
-        if ds["Channel Type"] == "OFDM Downstream":
+        # output changed somewhen between SR70.12.33 and SR70.12.42
+        if re.match(r'^OFDM(?: Downstream)?$', ds["Channel Type"]):
             # check lowest possible profile
             modulation = ofdm_profiles[int(ds["Modulation/Profile ID"].split(",")[0])]
         else:
