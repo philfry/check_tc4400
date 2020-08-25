@@ -110,7 +110,7 @@ def main():
     if len(tables) == 0:
         nagexit(3, ["Unable to parse connectionstatus page"])
 
-    floaty = re.compile(r'^\d+(\.\d+)?')
+    floaty = re.compile(r'^-?\d+(\.\d+)?')
 
     perfdata = []
     statusline = []
