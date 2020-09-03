@@ -86,7 +86,10 @@ def main():
             nagexit(3, ["Cannot open file {}".format(options.file)])
     else:
         try:
-            req = urllib.request.Request("http://"+options.host+"/cmconnectionstatus.html")
+            req = urllib.request.Request(
+                "http://"+options.host+"/cmconnectionstatus.html",
+                headers = {'User-Agent': 'nagios/check_tc4400'}
+            )
             if options.password != None:
                 auth = base64.b64encode(
                     bytes("%s:%s" % (options.user, options.password), 'ascii')
