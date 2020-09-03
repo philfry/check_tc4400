@@ -85,6 +85,8 @@ def main():
         except (FileNotFoundError, PermissionError):
             nagexit(3, ["Cannot open file {}".format(options.file)])
     else:
+        try: urllib.request.urlopen("http://"+options.host+"/cmconnectionstatus.html")
+        except: pass
         try:
             req = urllib.request.Request(
                 "http://"+options.host+"/cmconnectionstatus.html",
