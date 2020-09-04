@@ -33,6 +33,12 @@ check_tc4400
     nonetheless, or you're connected both with docsis 3.0 and 3.1 but the modem
     only uses either of them.
 
+- **s**,**startle**
+
+    Startle the modem by sending an unauthorized dummy request prior to the
+	"real" request for data. Use this workaround if your modem randomly times
+	out with check_tc4400.
+
 ## DESCRIPTION
 
 This script connects to the TC4400 webinterface and parses the connection status page.
