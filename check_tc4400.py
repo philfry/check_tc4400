@@ -151,8 +151,10 @@ def main():
         if re.match(r'^OFDM(?: Downstream)?$', ds["Channel Type"]):
             # check lowest possible profile
             modulation = ofdm_profiles[int(ds["Modulation/Profile ID"].split(",")[0])]
+            spec = "docsis31"
         else:
             modulation = ds["Modulation/Profile ID"].lower()
+            spec = "docsis30"
 
         bits = int(log(int(re.search(r'(\d+)$', modulation).group(0)))/log(2))
         perfdata.append(
@@ -171,6 +173,8 @@ def main():
             statusline.append("uch{:02d}@{:.1f}MHz is {}".format(
                 int(ds["Channel Index"]), frq, ds["Lock Status"]
             ))
+
+        if spec == options.igndocsis: continue
 
         t_rc = check_range(rlvl, *thresholds._rlvl[modulation])
         if t_rc > 0:
@@ -255,7 +259,7 @@ if __name__ == "__main__":
         help="Read data from file (usually for debugging purposes)")
 
     # -i / --ignore
-    thres_opts.add_option("-i", "--ignore", dest="docsisver",
+    thres_opts.add_option("-i", "--ignore", dest="igndocsis",
         type="string", action="store",
         help="""Do not check thresholds for DOCSISVER ("docsis30" or
 "docsis31"). Collect perfdata though.
