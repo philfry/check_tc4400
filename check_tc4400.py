@@ -10,6 +10,7 @@ import base64
 import urllib.request
 import lxml.html
 import re
+from math import log
 
 class thresholds:
     # snr limits [warn, crit]
@@ -153,10 +154,11 @@ def main():
         else:
             modulation = ds["Modulation/Profile ID"].lower()
 
+        bits = int(log(int(re.search(r'(\d+)$', modulation).group(0)))/log(2))
         perfdata.append(
-            'dn{c:02d}_snr={:.1f};;; dn{c:02d}_rlvl={:.1f};;; dn{c:02d}_cwpass={}c;;; dn{c:02d}_cwcorr={}c;;; dn{c:02d}_cwfail={}c;;;'.format(
-                snr, rlvl, ds["Unerrored Codewords"], ds["Corrected Codewords"], ds["Uncorrectable Codewords"], c=int(ds["Channel Index"]),
-            ))
+            'dn{c:02d}_snr={:.1f};;; dn{c:02d}_rlvl={:.1f};;; dn{c:02d}_cwpass={}c;;; dn{c:02d}_cwcorr={}c;;; dn{c:02d}_cwfail={}c;;; dn{c:02d}_bits={};;;'.format(
+            snr, rlvl, ds["Unerrored Codewords"], ds["Corrected Codewords"], ds["Uncorrectable Codewords"], bits, c=int(ds["Channel Index"]),
+        ))
 
         if ds["Lock Status"] != "Locked":
             if rc < 1: rc = 1

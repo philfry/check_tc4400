@@ -59,6 +59,19 @@ for ($c = 1;; $c++) {
     $def[$i] .= rrd::gprint($v, array("LAST", "AVERAGE", "MIN", "MAX"), "%3.1lf dBmV");
 }
 
+// ==== downstream modulation ====
+$i++;
+$ds_name[$i] = "ds_modbits";
+$opt[$i] = " --vertical-label bits -l 1 -u 8 --title \"Downstream modulation\" ";
+$def[$i] = "";
+for ($c = 1;; $c++) {
+    $v = sprintf("dn%02d_bits", $c);
+    if (!isset($myds[$v])) break;
+    $def[$i] .= rrd::def($v, $RRDFILE[$myds[$v]], $DS[$myds[$v]], "AVERAGE");
+    $def[$i] .= rrd::line1($v, rrd::color($c), rrd::cut("channel $c", 24));
+    $def[$i] .= rrd::gprint($v, array("LAST", "AVERAGE", "MIN", "MAX"), "%1.0lf bits");
+}
+
 // ==== downstream codewords ====
 foreach (array(
     'cwpass' => 'unerrored',
