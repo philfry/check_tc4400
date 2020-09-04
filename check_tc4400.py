@@ -85,6 +85,9 @@ def main():
         except (FileNotFoundError, PermissionError):
             nagexit(3, ["Cannot open file {}".format(options.file)])
     else:
+        if options.startle:
+            try: urllib.request.urlopen("http://"+options.host+"/cmconnectionstatus.html")
+            except: pass
         try:
             req = urllib.request.Request(
                 "http://"+options.host+"/cmconnectionstatus.html",
@@ -224,8 +227,10 @@ if __name__ == "__main__":
     parser = OptionParser(description=desc,version="%prog version 0.8")
     gen_opts = OptionGroup(parser, "Generic options")
     thres_opts = OptionGroup(parser, "Threshold options")
+    workaround_opts = OptionGroup(parser, "Workaround options")
     parser.add_option_group(gen_opts)
     parser.add_option_group(thres_opts)
+    parser.add_option_group(workaround_opts)
 
     # -H / --host
     gen_opts.add_option("-H", "--hostname", dest="host",
@@ -255,6 +260,11 @@ if __name__ == "__main__":
 Useful when your line performance is really bad but your modem works
 nonetheless, or you're connected both with docsis 3.0 and 3.1 but the modem
 only uses either of them.""")
+
+    # -s / --startle
+    workaround_opts.add_option("-s", "--startle", dest="startle",
+        action="store_true", default=False,
+        help="Startle modem by sending an additional unauthorized dummy request")
 
     (options, args) = parser.parse_args()
 
