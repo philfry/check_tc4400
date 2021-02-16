@@ -35,8 +35,8 @@ class thresholds:
     # transmission level ranges
     # min crit, min warn, max warn, max crit
     _tlvl = {
-        'atdma': [ 35, 37, 51.1, 53.1], # docsis 3.0
-        'ofdm':  [ 38, 40, 48.1, 50.1]  # docsis 3.1
+        'sc-qam upstream': [ 35, 37, 51.1, 53.1], # docsis 3.0
+        'ofdm upstream':  [ 34, 36, 48.1, 50.1]  # docsis 3.1
     }
 
 ofdm_profiles = ['qam256', 'qam1024', 'qam2048', 'qam4096']
@@ -195,7 +195,7 @@ def main():
     for ds in upstream_chan_data:
         tlvl = float(re.search(floaty, ds["Transmit Level"]).group(0))
         frq = float(re.search(floaty, ds["Center Frequency"]).group(0))/10**6
-        modulation = ds["Modulation/Profile ID"].lower()
+        chantype = ds["Channel Type"].lower()
 
         perfdata.append(
             'up{c:02d}_tlvl={:.1f};;;'.format(tlvl, c=int(ds["Channel Index"]))
@@ -213,7 +213,7 @@ def main():
                 int(ds["Channel Index"]), frq, ds["Lock Status"]
             ))
 
-        t_rc = check_range(tlvl, *thresholds._tlvl[modulation])
+        t_rc = check_range(tlvl, *thresholds._tlvl[chantype])
         if t_rc > 0:
             if rc < t_rc: rc = t_rc
             statusline.append("uch{:02d}@{:.1f}MHz signal out of range ({})".format(
@@ -230,7 +230,7 @@ def main():
 
 if __name__ == "__main__":
     desc = "%prog checks your tc4400's status and performance data."
-    parser = OptionParser(description=desc,version="%prog version 0.8")
+    parser = OptionParser(description=desc,version="%prog version 0.11")
     gen_opts = OptionGroup(parser, "Generic options")
     thres_opts = OptionGroup(parser, "Threshold options")
     workaround_opts = OptionGroup(parser, "Workaround options")
