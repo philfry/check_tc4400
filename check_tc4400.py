@@ -210,7 +210,7 @@ def main():
         if ds["Bonding Status"] != "Bonded":
             if rc < 1: rc = 1
             statusline.append("uch{:02d}@{:.1f}MHz is {}".format(
-                int(ds["Channel Index"]), frq, ds["Lock Status"]
+                int(ds["Channel Index"]), frq, ds["Bonding Status"]
             ))
 
         t_rc = check_range(tlvl, *thresholds._tlvl[chantype])
@@ -230,7 +230,7 @@ def main():
 
 if __name__ == "__main__":
     desc = "%prog checks your tc4400's status and performance data."
-    parser = OptionParser(description=desc,version="%prog version 0.11")
+    parser = OptionParser(description=desc,version="%prog version 0.12")
     gen_opts = OptionGroup(parser, "Generic options")
     thres_opts = OptionGroup(parser, "Threshold options")
     workaround_opts = OptionGroup(parser, "Workaround options")
